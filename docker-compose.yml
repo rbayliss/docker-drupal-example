@@ -1,0 +1,46 @@
+varnish:
+  image: jacksoncage/varnish
+  environment:
+    VARNISH_BACKEND_IP: web
+  links:
+    - web:web
+  ports:
+    - 8100:80
+
+web:
+  # A base image with Apache/PHP (https://registry.hub.docker.com/u/rbayliss/php/)
+  image: rbayliss/php:5.5
+  volumes:
+    # Mount the local drupal directory in the container
+    - ./drupal:/srv
+    # Mount our install shell script
+    - ./install.sh:/install.sh
+  ports:
+    # Pass connections from the host's port 8100 to the container's port 80
+    - 8101:80
+  links:
+    # Specify that the container can access the "db" container using the "db" hostname.
+    - db:db
+
+db:
+  # A docker official base image for MySQL
+  image: mysql:5.6
+  # Default environment variables used to set up the container on the first run:
+  environment:
+    MYSQL_ROOT_PASSWORD: changeme
+    MYSQL_DATABASE: drupal
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: password
+  volumes:
+    # Use a "volume" to prevent data from disappearing when the container is
+    # restarted.
+    - /var/lib/mysql
+    # In a production setting, you'd use a locally mounted volume for extra
+    # persistence.  This would mount ./data to /var/lib/mysql inside the container:
+    # - ./data:/var/lib/mysql
+
+search:
+  # Example of building a container from scratch instead of reusing one:
+  build: solr/
+  ports:
+    - 8983:8983
