@@ -1,9 +1,13 @@
 varnish:
+  # A public image with a Varnish install
   image: jacksoncage/varnish
+  # Pass backend connections to the linked "web" container
   environment:
     VARNISH_BACKEND_IP: web
+  # Set up the internal link
   links:
     - web:web
+  # Expose port 8100 on the host.
   ports:
     - 8100:80
 
@@ -16,7 +20,7 @@ web:
     # Mount our install shell script
     - ./install.sh:/install.sh
   ports:
-    # Pass connections from the host's port 8100 to the container's port 80
+    # Expose port 8101 on the host.  Useful for debugging w/o Varnish
     - 8101:80
   links:
     # Specify that the container can access the "db" container using the "db" hostname.
@@ -40,7 +44,8 @@ db:
     # - ./data:/var/lib/mysql
 
 search:
-  # Example of building a container from scratch instead of reusing one:
+  # Example of extending a container with our own Dockerfile
   build: solr/
+  # Expose port 8983 directly on the host
   ports:
     - 8983:8983
