@@ -23,8 +23,10 @@ web:
     # Expose port 8101 on the host.  Useful for debugging w/o Varnish
     - 8101:80
   links:
-    # Specify that the container can access the "db" container using the "db" hostname.
+    # Link the DB container:
     - db:db
+    # Link the Solr container:
+    - solr:solr
 
 db:
   # A docker official base image for MySQL
@@ -43,7 +45,7 @@ db:
     # persistence.  This would mount ./data to /var/lib/mysql inside the container:
     # - ./data:/var/lib/mysql
 
-search:
+solr:
   # Example of extending a container with our own Dockerfile
   build: solr/
   # Expose port 8983 directly on the host
